@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f7fb">
+    <meta name="description" content="A simple study planner to organize your learning tasks and stay productive.">
+    <title>Studyflow — Student Study Planner</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #202b45;
+            --muted: #78839a;
+            --purple: #6754e8;
+            --purple-dark: #5542d2;
+            --line: #e9ebf3;
+            --surface: #ffffff;
+            --background: #f5f7fb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background:
+                radial-gradient(ellipse at 85% 4%, rgba(196, 187, 255, 0.26), transparent 28rem),
+                var(--background);
+            color: var(--ink);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page {
+            width: min(100% - 40px, 1000px);
+            margin: 0 auto;
+            padding: 28px 0 64px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 56px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 11px;
+            color: var(--ink);
+            font-size: 17px;
+            font-weight: 750;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .brand-mark {
+            display: grid;
+            width: 38px;
+            height: 38px;
+            place-items: center;
+            border-radius: 12px;
+            background: var(--purple);
+            color: white;
+            box-shadow: 0 6px 14px rgba(103, 84, 232, 0.22);
+        }
+
+        .topbar-note {
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 550;
+        }
+
+        .intro {
+            max-width: 650px;
+            margin: 0 auto 34px;
+            text-align: center;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin: 0 0 14px;
+            color: var(--purple);
+            font-size: 12px;
+            font-weight: 750;
+            letter-spacing: 1.15px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(32px, 6vw, 48px);
+            font-weight: 760;
+            letter-spacing: -2.2px;
+            line-height: 1.12;
+        }
+
+        .intro p {
+            margin: 14px 0 0;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .planner {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 270px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .card {
+            border: 1px solid rgba(226, 229, 239, 0.9);
+            border-radius: 18px;
+            background: var(--surface);
+            box-shadow: 0 14px 40px rgba(34, 43, 69, 0.055);
+        }
+
+        .tasks-card {
+            overflow: hidden;
+            padding: 27px 28px 17px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 21px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 720;
+            letter-spacing: -0.45px;
+        }
+
+        .section-caption {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .task-total {
+            flex: 0 0 auto;
+            border: 1px solid #e8e4ff;
+            border-radius: 999px;
+            background: #f5f3ff;
+            color: var(--purple-dark);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 7px 11px;
+        }
+
+        .task-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .task-input {
+            min-width: 0;
+            flex: 1;
+            height: 48px;
+            padding: 0 14px;
+            border: 1px solid #dfe3ed;
+            border-radius: 10px;
+            outline: none;
+            background: #fff;
+            color: var(--ink);
+            font: inherit;
+            font-size: 14px;
+            transition: border-color 150ms ease, box-shadow 150ms ease;
+        }
+
+        .task-input::placeholder {
+            color: #a0a8b8;
+        }
+
+        .task-input:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(103, 84, 232, 0.12);
+        }
+
+        .add-button {
+            display: inline-flex;
+            height: 48px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 17px;
+            border: 0;
+            border-radius: 10px;
+            background: var(--purple);
+            color: #fff;
+            cursor: pointer;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 680;
+            white-space: nowrap;
+            transition: background 150ms ease, transform 150ms ease;
+        }
+
+        .add-button:hover {
+            background: var(--purple-dark);
+            transform: translateY(-1px);
+        }
+
+        .add-button:focus-visible {
+            outline: 3px solid rgba(103, 84, 232, 0.3);
+            outline-offset: 3px;
+        }
+
+        .list-label {
+            margin: 0 0 7px;
+            color: #9aa2b2;
+            font-size: 11px;
+            font-weight: 750;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        #taskList {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        #taskList li {
+            position: relative;
+            display: flex;
+            min-height: 54px;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #f0f1f5;
+            color: #3e4961;
+            font-size: 14px;
+            line-height: 1.45;
+            overflow-wrap: anywhere;
+        }
+
+        #taskList li:last-child {
+            border-bottom: 0;
+        }
+
+        #taskList li::before {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 17px;
+            border: 1.5px solid #c9cde0;
+            border-radius: 6px;
+            content: "";
+        }
+
+        .side-card {
+            padding: 23px;
+        }
+
+        .side-icon {
+            display: grid;
+            width: 42px;
+            height: 42px;
+            margin-bottom: 18px;
+            place-items: center;
+            border-radius: 13px;
+            background: #f1efff;
+            color: var(--purple);
+        }
+
+        .side-card h2 {
+            font-size: 16px;
+        }
+
+        .side-card p {
+            margin: 10px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .tip-divider {
+            height: 1px;
+            margin: 19px 0;
+            background: var(--line);
+        }
+
+        .tip-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            color: #68748b;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .tip-note span {
+            color: #e8a43d;
+        }
+
+        .primary-nav {
+            display: flex;
+            gap: 7px;
+            margin: -35px 0 34px;
+            padding: 6px;
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.78);
+            scrollbar-width: thin;
+        }
+
+        .primary-nav a {
+            flex: 0 0 auto;
+            padding: 10px 15px;
+            border-radius: 9px;
+            color: #68748b;
+            font-size: 13px;
+            font-weight: 650;
+            text-decoration: none;
+            transition: background 150ms ease, color 150ms ease;
+        }
+
+        .primary-nav a:hover,
+        .primary-nav a[aria-current="page"] {
+            background: #f1efff;
+            color: var(--purple-dark);
+        }
+
+        .primary-nav a:focus-visible,
+        .text-button:focus-visible,
+        .icon-button:focus-visible,
+        .danger-button:focus-visible,
+        .calendar-day:focus-visible,
+        .subject-remove:focus-visible {
+            outline: 3px solid rgba(103, 84, 232, 0.3);
+            outline-offset: 2px;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .app-message {
+            margin: 0 0 18px;
+            padding: 11px 14px;
+            border: 1px solid #f1d6a5;
+            border-radius: 10px;
+            background: #fff9eb;
+            color: #7b5515;
+            font-size: 13px;
+        }
+
+        .view-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+            margin: 0 0 22px;
+        }
+
+        .view-header h1 {
+            font-size: clamp(27px, 5vw, 36px);
+            letter-spacing: -1.4px;
+        }
+
+        .view-header p {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .dashboard-grid,
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            padding: 20px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .stat-value {
+            display: block;
+            margin-top: 9px;
+            color: var(--ink);
+            font-size: 28px;
+            font-weight: 750;
+            letter-spacing: -1px;
+        }
+
+        .content-card {
+            padding: 24px;
+        }
+
+        .card-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 17px;
+        }
+
+        .text-button {
+            border: 0;
+            background: transparent;
+            color: var(--purple-dark);
+            cursor: pointer;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .task-fields {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 175px 165px auto;
+            gap: 10px;
+            margin-bottom: 21px;
+        }
+
+        .form-control {
+            width: 100%;
+            min-width: 0;
+            height: 45px;
+            padding: 0 12px;
+            border: 1px solid #dfe3ed;
+            border-radius: 9px;
+            background: #fff;
+            color: var(--ink);
+            font: inherit;
+            font-size: 13px;
+        }
+
+        .form-control:focus {
+            border-color: var(--purple);
+            outline: 3px solid rgba(103, 84, 232, 0.12);
+        }
+
+        .task-rows {
+            display: grid;
+        }
+
+        .task-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 64px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f1f5;
+        }
+
+        .task-row:last-child {
+            border-bottom: 0;
+        }
+
+        .task-check {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 18px;
+            accent-color: var(--purple);
+            cursor: pointer;
+        }
+
+        .task-copy {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .task-name {
+            display: block;
+            color: #3e4961;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .task-row.is-complete .task-name {
+            color: #929bad;
+            text-decoration: line-through;
+        }
+
+        .task-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .subject-pill {
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: #f2f0ff;
+            color: #5b4ac8;
+            font-weight: 650;
+        }
+
+        .icon-button,
+        .subject-remove {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
+            place-items: center;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: #8992a4;
+            cursor: pointer;
+            font: inherit;
+            font-size: 19px;
+        }
+
+        .icon-button:hover,
+        .subject-remove:hover {
+            background: #fff0f0;
+            color: #bb4c52;
+        }
+
+        .empty-state {
+            padding: 22px 10px;
+            color: var(--muted);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .subject-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .subject-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .subject-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 58px;
+            padding: 10px 12px 10px 15px;
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            color: #3e4961;
+            font-size: 14px;
+        }
+
+        .calendar-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-nav {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            background: #fff;
+            color: var(--ink);
+            cursor: pointer;
+            font-size: 19px;
+        }
+
+        .calendar-month {
+            min-width: 145px;
+            font-size: 15px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+        }
+
+        .calendar-weekday {
+            padding: 12px 4px;
+            color: #929bad;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .calendar-day {
+            position: relative;
+            min-height: 62px;
+            border: 0;
+            border-top: 1px solid #f0f1f5;
+            background: transparent;
+            color: #3e4961;
+            cursor: pointer;
+            font: inherit;
+            font-size: 13px;
+        }
+
+        .calendar-day:hover {
+            background: #f8f7ff;
+        }
+
+        .calendar-day.is-outside {
+            color: #c2c7d2;
+        }
+
+        .calendar-day.is-today::first-line {
+            color: var(--purple-dark);
+            font-weight: 750;
+        }
+
+        .calendar-day.is-selected {
+            border-radius: 8px;
+            background: #f1efff;
+            color: var(--purple-dark);
+            font-weight: 750;
+        }
+
+        .calendar-dots {
+            display: block;
+            min-height: 7px;
+            margin-top: 3px;
+            color: var(--purple);
+            font-size: 9px;
+            letter-spacing: 2px;
+        }
+
+        .calendar-agenda {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid var(--line);
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 18px 0;
+            border-bottom: 1px solid #f0f1f5;
+        }
+
+        .settings-row:last-child {
+            border-bottom: 0;
+        }
+
+        .settings-row strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .settings-row p {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .danger-button {
+            min-height: 38px;
+            padding: 0 12px;
+            border: 1px solid #f1caca;
+            border-radius: 9px;
+            background: #fff;
+            color: #b54148;
+            cursor: pointer;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .theme-toggle {
+            width: 42px;
+            height: 24px;
+            accent-color: var(--purple);
+            cursor: pointer;
+        }
+
+        body.dark-theme {
+            --ink: #edf0fa;
+            --muted: #a4adc1;
+            --line: #33394c;
+            --surface: #242a3b;
+            --background: #191e2c;
+            background: var(--background);
+        }
+
+        body.dark-theme .primary-nav,
+        body.dark-theme .form-control,
+        body.dark-theme .icon-nav,
+        body.dark-theme .danger-button {
+            background: #242a3b;
+            color: var(--ink);
+        }
+
+        body.dark-theme .primary-nav a {
+            color: #a4adc1;
+        }
+
+        body.dark-theme .primary-nav a:hover,
+        body.dark-theme .primary-nav a[aria-current="page"],
+        body.dark-theme .calendar-day.is-selected {
+            background: #393354;
+            color: #d3ccff;
+        }
+
+        body.dark-theme .task-name,
+        body.dark-theme .task-row,
+        body.dark-theme .subject-item,
+        body.dark-theme .calendar-day {
+            color: #d9deeb;
+        }
+
+        body.dark-theme .subject-item,
+        body.dark-theme .form-control {
+            border-color: var(--line);
+        }
+
+        @media (max-width: 700px) {
+            .page {
+                width: min(100% - 30px, 520px);
+                padding-top: 20px;
+            }
+
+            .topbar {
+                margin-bottom: 43px;
+            }
+
+            .topbar-note {
+                font-size: 11px;
+            }
+
+            .planner {
+                grid-template-columns: 1fr;
+            }
+
+            .tasks-card {
+                padding: 22px 19px 13px;
+            }
+
+            .side-card {
+                padding: 20px;
+            }
+
+            .primary-nav {
+                margin-top: -26px;
+            }
+
+            .dashboard-grid,
+            .stats-grid {
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .task-fields {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .task-fields .add-button {
+                width: auto;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .task-form {
+                flex-direction: column;
+            }
+
+            .add-button {
+                width: 100%;
+            }
+
+            .view-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .content-card {
+                padding: 18px;
+            }
+
+            .subject-list {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-day {
+                min-height: 48px;
+            }
+
+            .calendar-month {
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="topbar">
+            <a class="brand" href="#" aria-label="Studyflow home">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
+                        <path d="M5 5.5C7.8 4.7 10.1 5.2 12 6.7v12c-1.9-1.5-4.2-2-7-1.2v-12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                        <path d="M19 5.5c-2.8-.8-5.1-.3-7 1.2v12c1.9-1.5 4.2-2 7-1.2v-12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                Studyflow
+            </a>
+            <span class="topbar-note" id="todayLabel">Your space to focus and grow</span>
+        </header>
+
+        <nav class="primary-nav" aria-label="Main navigation">
+            <a href="#dashboard" data-page-link="dashboard">Dashboard</a>
+            <a href="#tasks" data-page-link="tasks">Tasks</a>
+            <a href="#calendar" data-page-link="calendar">Calendar</a>
+            <a href="#subjects" data-page-link="subjects">Subjects</a>
+            <a href="#settings" data-page-link="settings">Settings</a>
+        </nav>
+
+        <main>
+            <p class="app-message" id="appMessage" role="status" hidden></p>
+
+            <section class="page-view" id="page-dashboard" data-page="dashboard" aria-labelledby="dashboard-title">
+                <div class="view-header">
+                    <div>
+                        <h1 id="dashboard-title">Welcome to your study planner</h1>
+                        <p>Plan your learning, one focused task at a time.</p>
+                    </div>
+                    <a class="add-button" href="#tasks">View tasks</a>
+                </div>
+                <div class="dashboard-grid">
+                    <article class="card stat-card">
+                        <span class="stat-label">Total tasks</span>
+                        <strong class="stat-value" id="dashboardTotal">0</strong>
+                    </article>
+                    <article class="card stat-card">
+                        <span class="stat-label">Completed</span>
+                        <strong class="stat-value" id="dashboardCompleted">0</strong>
+                    </article>
+                    <article class="card stat-card">
+                        <span class="stat-label">Subjects</span>
+                        <strong class="stat-value" id="dashboardSubjects">0</strong>
+                    </article>
+                </div>
+                <section class="card content-card">
+                    <div class="card-title-row">
+                        <div>
+                            <h2>Next up</h2>
+                            <p class="section-caption">Your open tasks, ready when you are.</p>
+                        </div>
+                        <a class="text-button" href="#tasks">Manage tasks</a>
+                    </div>
+                    <div class="task-rows" id="dashboardTasks"></div>
+                </section>
+            </section>
+
+            <section class="page-view" id="page-tasks" data-page="tasks" aria-labelledby="tasks-title" hidden>
+                <div class="view-header">
+                    <div>
+                        <h1 id="tasks-title">Your tasks</h1>
+                        <p>Add a study task, set a subject, and track your progress.</p>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <article class="card stat-card">
+                        <span class="stat-label">Tasks remaining</span>
+                        <strong class="stat-value" id="totalTasks">0</strong>
+                    </article>
+                </div>
+                <section class="card content-card">
+                    <form class="task-fields" id="taskForm">
+                        <input class="form-control" id="taskInput" name="task" type="text" maxlength="160" placeholder="What would you like to study?" aria-label="New study task" required>
+                        <select class="form-control" id="taskSubject" name="subject" aria-label="Task subject"></select>
+                        <input class="form-control" id="taskDueDate" name="dueDate" type="date" aria-label="Task due date">
+                        <button class="add-button" type="submit">Add task</button>
+                    </form>
+                    <div class="task-rows" id="taskList"></div>
+                </section>
+            </section>
+
+            <section class="page-view" id="page-calendar" data-page="calendar" aria-labelledby="calendar-title" hidden>
+                <div class="view-header">
+                    <div>
+                        <h1 id="calendar-title">Study calendar</h1>
+                        <p>See your deadlines and plan what to work on.</p>
+                    </div>
+                </div>
+                <section class="card content-card">
+                    <div class="card-title-row">
+                        <h2 class="calendar-month" id="calendarMonth" aria-live="polite"></h2>
+                        <div class="calendar-controls">
+                            <button class="icon-nav" id="previousMonth" type="button" aria-label="Previous month">‹</button>
+                            <button class="icon-nav" id="nextMonth" type="button" aria-label="Next month">›</button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid" aria-label="Calendar"></div>
+                    <div class="calendar-agenda">
+                        <div class="card-title-row">
+                            <h2 id="selectedDateLabel">Tasks for today</h2>
+                            <a class="text-button" id="calendarAddTask" href="#tasks">Add a task</a>
+                        </div>
+                        <div class="task-rows" id="calendarTasks"></div>
+                    </div>
+                </section>
+            </section>
+
+            <section class="page-view" id="page-subjects" data-page="subjects" aria-labelledby="subjects-title" hidden>
+                <div class="view-header">
+                    <div>
+                        <h1 id="subjects-title">Your subjects</h1>
+                        <p>Organize your work by class or area of study.</p>
+                    </div>
+                </div>
+                <section class="card content-card">
+                    <form class="subject-form" id="subjectForm">
+                        <input class="form-control" id="subjectInput" name="subject" type="text" maxlength="60" placeholder="e.g. Biology" aria-label="New subject" required>
+                        <button class="add-button" type="submit">Add subject</button>
+                    </form>
+                    <div class="subject-list" id="subjectList"></div>
+                </section>
+            </section>
+
+            <section class="page-view" id="page-settings" data-page="settings" aria-labelledby="settings-title" hidden>
+                <div class="view-header">
+                    <div>
+                        <h1 id="settings-title">Settings</h1>
+                        <p>Make Studyflow feel right for you.</p>
+                    </div>
+                </div>
+                <section class="card content-card">
+                    <div class="settings-row">
+                        <div>
+                            <strong>Dark appearance</strong>
+                            <p>Use a darker color theme for this planner.</p>
+                        </div>
+                        <input class="theme-toggle" id="themeToggle" type="checkbox" aria-label="Enable dark appearance">
+                    </div>
+                    <div class="settings-row">
+                        <div>
+                            <strong>Clear completed tasks</strong>
+                            <p>Remove finished tasks from your planner.</p>
+                        </div>
+                        <button class="danger-button" id="clearCompleted" type="button">Clear completed</button>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
